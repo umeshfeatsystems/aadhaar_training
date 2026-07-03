@@ -1,0 +1,84 @@
+# Primary recovery fine-tune.
+# Put your direct dataset zip URL in dataset.url, or set dataset.dir to an extracted
+# Roboflow/COCO export with train/valid/test folders.
+
+project:
+  name: aadhaar_recovery_v1
+  seed: 42
+
+paths:
+  checkpoint: checkpoint_best_total.pth
+  output_root: runs
+  reports_root: reports
+  registry_root: model_registry
+
+dataset:
+  name: aadhaar_recovery_v1
+  dir: datasets/releases/aadhaar_recovery_v1
+  url: ""
+  archive_path: datasets/downloads/aadhaar_recovery_v1.zip
+  required_splits:
+    - train
+    - valid
+    - test
+
+model:
+  size: medium
+  num_classes: auto
+  device: cuda
+
+train:
+  epochs: 60
+  batch_size: 8
+  grad_accum_steps: 2
+  lr: 0.00005
+  lr_encoder: 0.000075
+  weight_decay: 0.0001
+  resolution: 576
+  use_ema: true
+  gradient_checkpointing: false
+  checkpoint_interval: 10
+  early_stopping: true
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.001
+  early_stopping_use_ema: true
+  skip_best_epochs: 3
+  tensorboard: true
+  wandb: false
+  eval_interval: 1
+  eval_max_dets: 500
+  log_per_class_metrics: true
+  progress_bar: tqdm
+
+evaluation:
+  split: test
+  thresholds: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+  iou_threshold: 0.5
+  save_masked_samples: true
+
+redaction_policy:
+  document_positive_labels:
+    - aadhaar_no
+    - aadhaar_qr
+    - aadhaar_dob
+    - aadhaar_no_already_masked
+  mask_labels:
+    - aadhaar_no
+    - aadhaar_qr
+    - aadhaar_dob
+    - mobile_number
+  mask_thresholds:
+    aadhaar_no: 0.3
+    aadhaar_qr: 0.3
+    aadhaar_dob: 0.35
+    mobile_number: 0.35
+  box_expansion_px:
+    aadhaar_no: 10
+    aadhaar_qr: 6
+    aadhaar_dob: 6
+    mobile_number: 6
+  review_on_ocr_leakage: true
+
+package:
+  release_name: ""
+  copy_best_checkpoint: true

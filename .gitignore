@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+*.pth
+.pytest_cache/
+datasets/downloads/
+datasets/releases/
+runs/
+reports/
+model_registry/

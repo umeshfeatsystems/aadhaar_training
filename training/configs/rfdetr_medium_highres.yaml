@@ -1,0 +1,83 @@
+# Higher-resolution experiment for small text or difficult scans.
+# Use after the 576 px recovery run is working.
+
+project:
+  name: aadhaar_recovery_highres_v1
+  seed: 42
+
+paths:
+  checkpoint: checkpoint_best_total.pth
+  output_root: runs
+  reports_root: reports
+  registry_root: model_registry
+
+dataset:
+  name: aadhaar_recovery_v1
+  dir: datasets/releases/aadhaar_recovery_v1
+  url: ""
+  archive_path: datasets/downloads/aadhaar_recovery_v1.zip
+  required_splits:
+    - train
+    - valid
+    - test
+
+model:
+  size: medium
+  num_classes: auto
+  device: cuda
+
+train:
+  epochs: 80
+  batch_size: 4
+  grad_accum_steps: 4
+  lr: 0.00004
+  lr_encoder: 0.00006
+  weight_decay: 0.0001
+  resolution: 704
+  use_ema: true
+  gradient_checkpointing: false
+  checkpoint_interval: 10
+  early_stopping: true
+  early_stopping_patience: 12
+  early_stopping_min_delta: 0.001
+  early_stopping_use_ema: true
+  skip_best_epochs: 4
+  tensorboard: true
+  wandb: false
+  eval_interval: 1
+  eval_max_dets: 500
+  log_per_class_metrics: true
+  progress_bar: tqdm
+
+evaluation:
+  split: test
+  thresholds: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+  iou_threshold: 0.5
+  save_masked_samples: true
+
+redaction_policy:
+  document_positive_labels:
+    - aadhaar_no
+    - aadhaar_qr
+    - aadhaar_dob
+    - aadhaar_no_already_masked
+  mask_labels:
+    - aadhaar_no
+    - aadhaar_qr
+    - aadhaar_dob
+    - mobile_number
+  mask_thresholds:
+    aadhaar_no: 0.25
+    aadhaar_qr: 0.25
+    aadhaar_dob: 0.3
+    mobile_number: 0.3
+  box_expansion_px:
+    aadhaar_no: 12
+    aadhaar_qr: 8
+    aadhaar_dob: 8
+    mobile_number: 8
+  review_on_ocr_leakage: true
+
+package:
+  release_name: ""
+  copy_best_checkpoint: true

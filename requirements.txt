@@ -1,0 +1,8 @@
+# Install CUDA-enabled torch first on the GPU VM, then install this file.
+# See README.md for the exact order.
+rfdetr[train,loggers]==1.8.3
+supervision==0.27.0
+PyYAML>=6.0.1
+requests>=2.31.0
+Pillow>=10.0.0
+pytesseract>=0.3.10
