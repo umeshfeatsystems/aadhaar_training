@@ -52,6 +52,28 @@ function Get-VenvPython {
     return $FallbackPython
 }
 
+function Resolve-CheckpointPath {
+    param([string]$Path)
+
+    if (Test-Path $Path) {
+        return (Resolve-Path $Path).Path
+    }
+
+    if ($Path -eq "checkpoint_best_total.pth") {
+        $latest = Get-ChildItem -Path "runs" -Recurse -File -Filter "checkpoint_best_total.pth" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($null -ne $latest) {
+            Write-Host "Default checkpoint was not found in repo root. Using latest run checkpoint:" -ForegroundColor Yellow
+            Write-Host $latest.FullName -ForegroundColor Yellow
+            return $latest.FullName
+        }
+    }
+
+    throw "Checkpoint not found: $Path"
+}
+
 function Format-ThresholdName {
     param([double]$Value)
     return ($Value.ToString("0.##") -replace "\.", "p")
@@ -114,9 +136,7 @@ try {
         throw "Config not found: $Config"
     }
 
-    if (!(Test-Path $Checkpoint)) {
-        throw "Checkpoint not found: $Checkpoint"
-    }
+    $Checkpoint = Resolve-CheckpointPath -Path $Checkpoint
 
     $VenvPython = Get-VenvPython -VenvPath $VenvDir -FallbackPython $Python
     Invoke-Step "Show Python version" $VenvPython @("--version")
