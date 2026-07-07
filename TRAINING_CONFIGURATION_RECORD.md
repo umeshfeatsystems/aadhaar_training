@@ -122,6 +122,33 @@ Effective batch behavior:
 - Evaluation interval: every `1` epoch
 - Best epoch selection skips the first `3` epochs
 
+## Overfitting Control / Breakoff Behavior
+
+The primary run is configured with `60` as the maximum number of epochs, not as a mandatory fixed duration.
+
+Breakoff/early stopping is enabled:
+
+```yaml
+early_stopping: true
+early_stopping_patience: 10
+early_stopping_min_delta: 0.001
+early_stopping_use_ema: true
+eval_interval: 1
+skip_best_epochs: 3
+```
+
+Meaning:
+
+- The model is evaluated every epoch.
+- Training can stop before epoch `60` if validation performance does not improve enough.
+- `early_stopping_patience: 10` means the trainer allows up to 10 evaluation rounds without meaningful improvement before stopping.
+- `early_stopping_min_delta: 0.001` defines the minimum improvement considered meaningful.
+- `early_stopping_use_ema: true` means early stopping uses EMA-smoothed model behavior where supported by RF-DETR.
+- `skip_best_epochs: 3` prevents very early unstable epochs from being selected as the best checkpoint.
+- The final selected checkpoint is the best checkpoint found by the trainer, not simply the last epoch.
+
+Manager concern: if the model starts overfitting before 60 epochs, the validation metrics should stop improving or degrade, and early stopping should stop the run before completing all 60 epochs. The main condition is that the validation split must be clean and representative; if validation data is too similar to training data, any early-stopping system can miss overfitting.
+
 Model behavior:
 
 - RF-DETR model family: `medium`
