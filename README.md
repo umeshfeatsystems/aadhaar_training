@@ -118,7 +118,7 @@ CUDA_VISIBLE_DEVICES=0 training/scripts/run_training.sh \
   --dataset-url "https://your-secure-dataset-export.zip"
 ```
 
-The default run starts from [checkpoint_best_total.pth](/home/prod/Projects/Aadhaar_training/checkpoint_best_total.pth), uses RF-DETR Medium, `resolution=576`, `batch_size=8`, `grad_accum_steps=2`, EMA, early stopping, and `skip_best_epochs=3`.
+The default run starts from RF-DETR's default pretrain, uses RF-DETR Medium, `resolution=576`, `batch_size=8`, `grad_accum_steps=2`, EMA, early stopping, and `skip_best_epochs=3`. To fine-tune from a local checkpoint, pass `--checkpoint path/to/checkpoint_best_total.pth`.
 
 If GPU memory fails:
 
@@ -195,7 +195,7 @@ If the team extends labels, update the COCO categories and the YAML policy:
 - Add Aadhaar evidence labels to `redaction_policy.document_positive_labels`.
 - Keep `model.num_classes: auto` so the model class count is derived from `train/_annotations.coco.json`.
 
-If the old checkpoint cannot load after a major label change, set `paths.checkpoint: ""` and train from RF-DETR default pretrain.
+If an old checkpoint cannot load after a major label change, keep `paths.checkpoint: ""` and train from RF-DETR default pretrain.
 
 ## Release Gate
 

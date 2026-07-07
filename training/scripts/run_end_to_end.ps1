@@ -1,6 +1,6 @@
 param(
     [string]$Config = "training/configs/rfdetr_medium_recovery.yaml",
-    [string]$DatasetDir = "datasets/releases/aadhaar_recovery_v1",
+    [string]$DatasetDir = "datasets/releases",
     [string]$DatasetZip = "",
     [string]$Device = "cuda",
     [string]$RunName = "",
@@ -49,6 +49,28 @@ function Get-VenvPython {
     throw "Virtual environment Python was not found in: $VenvPath"
 }
 
+function Test-DatasetRoot {
+    param([string]$Path)
+
+    return (Test-Path (Join-Path $Path "train/_annotations.coco.json"))
+}
+
+function Resolve-DatasetDir {
+    param([string]$Path)
+
+    if (Test-Path $Path) {
+        return $Path
+    }
+
+    $parent = Split-Path -Parent $Path
+    if (![string]::IsNullOrWhiteSpace($parent) -and (Test-DatasetRoot $parent)) {
+        Write-Host "Dataset folder not found at $Path; using detected dataset root: $parent" -ForegroundColor Yellow
+        return $parent
+    }
+
+    throw "Dataset directory not found: $Path. Put train/valid/test there or pass -DatasetDir path\to\dataset or -DatasetZip path\to\dataset.zip."
+}
+
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 Push-Location $RepoRoot
 
@@ -64,9 +86,7 @@ try {
     }
 
     if ([string]::IsNullOrWhiteSpace($DatasetZip)) {
-        if (!(Test-Path $DatasetDir)) {
-            throw "Dataset directory not found: $DatasetDir. Put train/valid/test there or pass -DatasetZip path\to\dataset.zip."
-        }
+        $DatasetDir = Resolve-DatasetDir $DatasetDir
     } else {
         if (!(Test-Path $DatasetZip)) {
             throw "Dataset zip not found: $DatasetZip"

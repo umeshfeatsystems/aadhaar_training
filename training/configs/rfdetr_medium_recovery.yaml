@@ -7,14 +7,14 @@ project:
   seed: 42
 
 paths:
-  checkpoint: checkpoint_best_total.pth
+  checkpoint: ""
   output_root: runs
   reports_root: reports
   registry_root: model_registry
 
 dataset:
   name: aadhaar_recovery_v1
-  dir: datasets/releases/aadhaar_recovery_v1
+  dir: datasets/releases
   url: ""
   archive_path: datasets/downloads/aadhaar_recovery_v1.zip
   required_splits:

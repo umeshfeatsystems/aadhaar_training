@@ -20,14 +20,14 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "seed": 42,
     },
     "paths": {
-        "checkpoint": "checkpoint_best_total.pth",
+        "checkpoint": "",
         "output_root": "runs",
         "registry_root": "model_registry",
         "reports_root": "reports",
     },
     "dataset": {
         "name": "aadhaar_recovery_v1",
-        "dir": "datasets/releases/aadhaar_recovery_v1",
+        "dir": "datasets/releases",
         "url": "",
         "archive_path": "datasets/downloads/aadhaar_recovery_v1.zip",
         "required_splits": ["train", "valid", "test"],

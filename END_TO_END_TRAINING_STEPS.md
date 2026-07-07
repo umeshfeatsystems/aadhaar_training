@@ -71,7 +71,6 @@ If training on another machine, copy this full folder there:
 
 ```text
 Aadhaar_training/
-  checkpoint_best_total.pth
   aadhaar_training/
   training/
   README.md
@@ -248,7 +247,7 @@ checkpoint_best_total.pth
 
 Why professionally:
 
-The first run should be conservative. It starts from the existing checkpoint and fine-tunes it using the new client-style dataset.
+The first run should be conservative. By default it starts from RF-DETR's default pretrain and fine-tunes it using the new client-style dataset. If you have a known-good local checkpoint, pass it with `--checkpoint path/to/checkpoint_best_total.pth`.
 
 ## Step 8: If CUDA Memory Fails
 
